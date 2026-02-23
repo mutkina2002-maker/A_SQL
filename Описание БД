@@ -1,0 +1,82 @@
+Clients
+Поле	Тип	Ключ	Описание
+client_id	INTEGER	PK	Уникальный идентификатор клиента
+last_name	NVARCHAR(50)		Фамилия
+name	NVARCHAR(50)		Имя
+patronymic	NVARCHAR(50)		Отчество
+tel_number	NVARCHAR(20)		Номер телефона
+email	NVARCHAR(100)		Электронная почта
+ser_passport	NVARCHAR(4)		Серия паспорта
+num_passport	NVARCHAR(7)		Номер паспорта
+
+
+Account (Счет)
+Поле	Тип	Ключ	Описание
+account_id	INTEGER	PK	Уникальный идентификатор счета
+client_id	INTEGER	FK → Client(client_id)	Владелец счета
+type_account	NVARCHAR(30)		Тип счета (кредитный, дебетовый и т.д.)
+currency	NVARCHAR(3)		Валюта счета (RUB, USD, EUR)
+balance	DECIMAL(15,2)		Текущий баланс (вычисляемое поле)
+account_status	NVARCHAR(20)		Статус счета (активен, просрочен, закрыт)
+
+
+Staff (Сотрудник)
+Поле	Тип	Ключ	Описание
+staff_id	INTEGER	PK	Уникальный идентификатор сотрудника
+last_name	NVARCHAR(50)		Фамилия
+name	NVARCHAR(50)		Имя
+patronymic	NVARCHAR(50)		Отчество
+tel_number	NVARCHAR(20)		Телефон
+email	NVARCHAR(100)		Email
+ser_passport	NVARCHAR(4)		Серия паспорта
+num_passport	NVARCHAR(7)		Номер паспорта
+INN	NVARCHAR(12)		ИНН
+
+
+Office (Отделение банка)
+Поле	Тип	Ключ	Описание
+office_id	INTEGER	PK	Уникальный идентификатор отделения
+address	NVARCHAR(200)		Адрес отделения
+tel	NVARCHAR(20)		Телефон
+
+
+Box_office (Касса)
+Поле	Тип	Ключ	Описание
+box_office_id	INTEGER	PK	Уникальный идентификатор кассы
+office_id	INTEGER	FK → Office(office_id)	Отделение, где расположена касса
+staff_id	INTEGER	FK → Staff(staff_id)	Ответственный сотрудник
+
+
+Collectors (Бригада инкассации/ состав команды)
+Поле	Тип	Ключ	Описание
+team_collectors_id	INTEGER	PK (часть)	Идентификатор команды
+staff_id	INTEGER	PK (часть), FK → Staff(staff_id)	Сотрудник в команде
+coll_status	NVARCHAR(20)		Статус участия (свободна, в пути и т.п.)
+
+
+Order (Заказ наличных)  – в SQL Order_cash
+Поле	Тип	Ключ	Описание
+order_id	INTEGER	PK	Уникальный номер заказа
+client_id	INTEGER	FK → Client(client_id)	Клиент, сделавший заказ
+box_office_id	INTEGER	FK → Box_office(box_office_id)	Касса, через которую оформлен заказ
+office_id	INTEGER	FK → Office(office_id)	Отделение выдачи наличных
+team_collectors_id	INTEGER	FK → Collectors(team_collectors_id)	Команда коллекторов, доставляющая деньги
+account_id	INTEGER	FK → Account(account_id)	Счет списания средств
+total_cash	DECIMAL(15,2)		Сумма заказа
+create_date	DATETIME		Дата и время создания заказа
+order_status	NVARCHAR(30)		Статус заказа (новый, в обработке, готов к выдаче, выдан, отменен)
+close_date	DATETIME		Дата фактического получения/закрытия
+comment	CHAR		Комментарий к заказу
+plan_date_delivery	DATETIME		Плановая дата доставки в отделение
+issue_code	NVARCHAR(20)		Код для получения (выдается клиенту)
+currency	NVARCHAR(3)		Валюта заказа
+commission	DECIMAL(10,2)		Комиссия за операцию
+
+Notification (Уведомления)  в SQL Notification_cash
+Поле	Тип	Ключ	Описание
+notification_id	INTEGER	PK	Уникальный идентификатор уведомления
+client_id	INTEGER	FK → Client(client_id)	Получатель уведомления
+notif_type	NVARCHAR(30)		Тип уведомления (SMS, email, push)
+notif_comment	NVARCHAR(255)		Текст уведомления
+notif_dispatch_date	DATETIME		Дата и время отправки
+notif_status	NVARCHAR(20)		Статус отправки (доставлено, ошибка)
